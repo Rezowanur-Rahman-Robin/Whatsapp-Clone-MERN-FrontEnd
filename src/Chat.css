@@ -52,10 +52,12 @@
 }
 .chat__name{
     position: absolute;
-    top: -15px;
-    font-weight: 900;
-    font-size: x-small;
+    top: -28px;
+    font-weight: 700;
+    font-size: small;
+    min-width: 220px;
 }
+
 
 .chat__footer{
     display: flex;

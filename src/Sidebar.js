@@ -4,16 +4,36 @@ import {Avatar, IconButton } from '@material-ui/core';
 import ChatIcon from '@material-ui/icons/Chat';
 import DonutLargeIcon from '@material-ui/icons/DonutLarge';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import SearchIcon from '@material-ui/icons/Search';
 import SidebarChat from './SidebarChat';
+import { useStateValue } from './StateProvider';
+import { auth } from './fbase';
+import { actionTypes } from './reducer';
 
-function Sidebar() {
+function Sidebar({rooms}) {
+    const [{user},dispatch]=useStateValue();
+     console.log(user);
+
+     const handleSignOut = ()=>{
+         auth.signOut();
+        dispatch({
+            type: actionTypes.SET_USER,
+            user:null
+        })
+     }
+
+
     return (
         <div className="sidebar">
             <div className="sidebar__header">
+                <div className="header__info">
                 <Avatar
-                src="https://cdn.fastly.picmonkey.com/contentful/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=800&q=70"
+                src={user?.photoURL}
                 />
+                <h4>{user?.displayName}</h4>
+                </div>
+                
 
                  <div className="sidebar__headerRight">
 
@@ -26,6 +46,10 @@ function Sidebar() {
                      <IconButton>
                          <MoreVertIcon/>
                      </IconButton>
+
+                     <IconButton>
+                     <PowerSettingsNewIcon onClick={handleSignOut}/>
+                     </IconButton>
                  </div>
             </div>
 
@@ -37,9 +61,15 @@ function Sidebar() {
             </div>
 
             <div className="sidebar__chats">
-                  <SidebarChat/>
-                  <SidebarChat/>
-                  <SidebarChat/>
+                  <SidebarChat addNewChat={true}/>
+                 {rooms.map((room)=>(
+                    
+                      <SidebarChat id={room._id} roomName={ room.name}/>
+                      
+                    
+
+                 ))}
+                  
             </div>
         </div>
     )

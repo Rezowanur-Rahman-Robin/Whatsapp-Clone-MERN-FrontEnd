@@ -11,6 +11,20 @@
     padding: 20px;
     border-right: 1px solid lightgrey;
 }
+
+
+
+.header__info{
+    display: flex;
+    align-items: center;
+}
+.header__info> h4{
+    margin-left: 5px;
+    font-family: serif;
+    color: #013501;
+}
+
+
 .sidebar__headerRight{
     display: flex;
     align-items: center;

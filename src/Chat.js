@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import './Chat.css';
 import {Avatar,IconButton} from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -7,19 +7,54 @@ import AttachFileIcon from '@material-ui/icons/AttachFile';
 import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
 import MicIcon from '@material-ui/icons/Mic';
 import axios from './axios';
+import {useParams} from 'react-router-dom';
+import { useStateValue } from './StateProvider';
 
-function Chat({messages}) {
+
+
+function Chat({messages,rooms}) {
 
     const [input,setInput] = useState("");
+    const [seed,setSeed]= useState('');
+    const {roomId}=useParams();
+    const [roomName,setRoomName]=useState('');
+    const [{user}, dispatch]= useStateValue();
+    
+
+    const roomMessages= messages.filter(message => message.roomId===roomId);
+
+
+    const lastMessage=roomMessages[roomMessages.length-1];
+        
+    
+    
+
+    useEffect(()=>{
+        if(roomId){
+            rooms.map((item)=>{
+                 if(item._id === roomId){
+                     setRoomName(item.name);
+                 }
+            });
+           
+        }
+
+    },[roomId])
+
+    useEffect(()=>{
+        setSeed(Math.floor(Math.random()*5000));
+  },[]);
 
     const sendMessage=async (e)=>{
            e.preventDefault();
 
            await axios.post("/messages/new",{
                message:input,
-               name:"Rezowanur Rahman Robin",
-               timestamp:"Just now!",
-               received:false,
+               name: user?.displayName,
+               timestamp: new Date().toUTCString(),
+               received:true,
+               roomId: roomId,
+               uId:user.uid
            });
 
            setInput('');
@@ -28,11 +63,11 @@ function Chat({messages}) {
     return (
         <div className="chat">
             <div className="chat__header">
-                 <Avatar/>
+            <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`}/>
 
                  <div className="chat__headerInfo">
-                     <h3>Room Name</h3>
-                     <p>Last seen at...</p>
+                     <h3>{roomName} </h3>
+                     <p>Last seen: {lastMessage.timestamp}</p>
 
                  </div>
 
@@ -53,11 +88,11 @@ function Chat({messages}) {
             </div>
 
             <div className="chat__body">
-                {messages.map((message)=>(
+                {roomMessages.map((message)=>(
 
-            <p className={`chat__message ${message.received && "chat__receiver"}`}>
+            <p className={`chat__message ${message.uId ==user.uid && "chat__receiver"}`}>
               <span className="chat__name">
-                         {message.name}
+                         { message.name}
               </span>
                      {message.message}
 
